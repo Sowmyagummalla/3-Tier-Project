@@ -38,7 +38,7 @@ pipeline {
         }
         stage('Trivy File Scan') {
             steps {
-                dir('client') {
+                dir('backend') {
                     sh 'trivy fs . > trivyfs.txt'
                 }
             }
@@ -46,7 +46,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script{
-                    dir('client') {
+                    dir('backend') {
                    withDockerRegistry(credentialsId: 'dockerhub'){
                       sh 'docker build -t $DOCKER_IMAGE .'
                       sh 'docker push $DOCKER_IMAGE'
@@ -67,14 +67,14 @@ pipeline {
         }
         stage('Update Deployment file') {
             steps {
-                dir('Kubernetes-Manifests-file') {
+                dir('kubernetes-files') {
                     withCredentials([string(credentialsId: 'github', variable: 'git_token')]) {
                         sh '''
                             git config user.email "sowmyareddygummalla@gmail.com"
                             git config user.name "Sowmyagummalla"
                             BUILD_NUMBER=latest
                             echo $BUILD_NUMBER
-                            sed -i "s#image:.*#image: sowmyagummalla/backend:${BUILD_NUMBER}#g" deploy_svc.yml
+                            sed -i "s#image:.*#image: sowmyagummalla/backend:${BUILD_NUMBER}#g" backend-deployment.yaml
                             git add .
                             git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
                             git push https://${git_token}@github.com/Sowmyagummalla/3-Tier-Project.git- HEAD:main
