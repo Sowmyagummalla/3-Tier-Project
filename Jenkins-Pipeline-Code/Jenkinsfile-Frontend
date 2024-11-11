@@ -72,14 +72,14 @@ pipeline {
         }
         stage('Update Deployment file') {
             steps {
-                dir('Kubernetes-Manifests-file') {
-                    withCredentials([string(credentialsId: 'github-token', variable: 'git_token')]) {
+                dir('kubernetes-files') {
+                    withCredentials([string(credentialsId: 'github', variable: 'git_token')]) {
                         sh '''
                             git config user.email "sowmyareddygummalla@gmail.com"
                             git config user.name "Sowmyagummalla"
                             BUILD_NUMBER=latest
                             echo $BUILD_NUMBER
-                            sed -i "s#image:.*#image: sowmyagummalla/frontend:${BUILD_NUMBER}#g" deploy_svc.yml
+                            sed -i "s#image:.*#image: sowmyagummalla/frontend:${BUILD_NUMBER}#g" frontend-deploy-service.yaml
                             git add .
                             git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
                             git push https://${git_token}@github.com/Sowmyagummalla/3-Tier-Project.git- HEAD:main
