@@ -25,13 +25,15 @@ pipeline {
         }
         stage('Sonarqube Analysis') {
             steps {
+                dir('client') {
                 withSonarQubeEnv('sonar-server') {
                     sh '''mvn clean verify sonar:sonar \
                     -Dsonar.projectName=project1 \
                     -Dsonar.projectKey=project1'''
                 }
-            }
-        }
+             }
+         }
+      }
         stage("quality gate") {
            steps {
                 script {
