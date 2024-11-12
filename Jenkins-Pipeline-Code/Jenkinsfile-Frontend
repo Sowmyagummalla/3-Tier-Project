@@ -78,23 +78,11 @@ pipeline {
                             sed -i "s#image:.*#image: sowmyagummalla/frontend:${BUILD_NUMBER}#g" frontend-deploy-service.yaml
                             git add .
                             git commit -m "Update deployment Image to version ${BUILD_NUMBER}"
-                            git push https://${git_token}@github.com/Sowmyagummalla/3-Tier-Project.git- HEAD:main
+                             git push https://${git_token}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                         '''
                     }
                 }
             }
         }
-        //stage('Deploy to kubernetes') {
-          //  steps {
-            //    script {
-              //      dir('Kubernetes-Manifests-file') {
-                //        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                  //          sh 'aws eks update-kubeconfig --name project-eks --region ap-south-1'
-                    //        sh 'kubectl apply -f deploy_svc.yml'
-                      //  }
-                    // }
-               // }
-           // }
-       // }
     }
 }
