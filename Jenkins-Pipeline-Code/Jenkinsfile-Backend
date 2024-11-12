@@ -5,6 +5,7 @@ pipeline {
         nodejs 'node22'
     }
     environment{
+        SCANNER_HOME=tool 'sonar-scanner'
         DOCKER_IMAGE = 'sowmyagummalla/backend:1.0'
     }
     stages {
@@ -20,15 +21,15 @@ pipeline {
         }
         stage('Sonarqube Analysis') {
             steps {
-                dir('backend') {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''mvn clean verify sonar:sonar \
-                    -Dsonar.projectName=three-tier-backend \
-                    -Dsonar.projectKey=three-tier-backend'''
+                dir('client') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=three-tier-backend \
+                        -Dsonar.projectKey=three-tier-backend '''
+                    }
                 }
-             }
-         }
-      }
+            }
+        }
         stage("quality gate") {
            steps {
                 script {
@@ -36,13 +37,13 @@ pipeline {
                 }
             }
         }
-        stage('Trivy File Scan') {
-            steps {
-                dir('backend') {
-                    sh 'trivy fs . > trivyfs.txt'
-                }
-            }
-        }
+      //  stage('Trivy File Scan') {
+       //     steps {
+        //        dir('backend') {
+        //            sh 'trivy fs . > trivyfs.txt'
+         //       }
+         //   }
+       // }
         stage('Build Docker Image') {
             steps {
                 script{
@@ -83,17 +84,5 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to kubernetes') {
-            steps {
-                script {
-                    dir('Kubernetes-Manifests-file') {
-                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                            sh 'aws eks update-kubeconfig --name project-eks --region ap-south-1'
-                            sh 'kubectl apply -f deploy_svc.yml'
-                        }
-                    }
-                }
-            }
-        }
-    }
+   }
 }
