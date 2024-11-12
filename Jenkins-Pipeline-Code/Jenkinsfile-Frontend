@@ -5,6 +5,7 @@ pipeline {
         nodejs 'node22'
     }
     environment{
+        SCANNER_HOME=tool 'sonar-scanner'
         DOCKER_IMAGE = 'sowmyagummalla/frontend:1.0'
     }
     stages {
@@ -18,29 +19,17 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Sowmyagummalla/3-Tier-Project.git'
             }
         }
-        stage('Install Dependencies') {
-            steps {
-                // Install dependencies using npm
-                sh 'npm install'
-            }
-        }
-        stage('Run Tests') {
-            steps {
-                // Run tests (assuming you have test scripts defined in package.json)
-                sh 'npm test'
-            }
-        } 
         stage('Sonarqube Analysis') {
             steps {
-                dir('backend') {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''mvn clean verify sonar:sonar \
-                    -Dsonar.projectName=three-tier-backend \
-                    -Dsonar.projectKey=three-tier-backend'''
+                dir('client') {
+                    withSonarQubeEnv('sonar-server') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=three-tier-frontend \
+                        -Dsonar.projectKey=three-tier-frontend '''
+                    }
                 }
-             }
-         }
-      }
+            }
+        }
         stage("quality gate") {
            steps {
                 script {
