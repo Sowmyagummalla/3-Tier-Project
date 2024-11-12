@@ -23,12 +23,13 @@ pipeline {
                 dir('client') {
                 withSonarQubeEnv('sonar-server') {
                     sh '''mvn clean verify sonar:sonar \
-                    -Dsonar.projectName=three-tier-frontend \
-                    -Dsonar.projectKey=three-tier-frontend'''
-                }
+                             -Dsonar.projectKey=3-tier-project \
+                             -Dsonar.host.url=http://13.235.244.202:9000 \
+                             -Dsonar.login=squ_a30d6d5effbf768bec28ac25fb4a47cce8adaa36'''
+                      }
+                  }   
              }
-         }
-      }
+        }
         stage("quality gate") {
            steps {
                 script {
